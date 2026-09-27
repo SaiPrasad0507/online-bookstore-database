@@ -1,0 +1,48 @@
+-- =========================================
+-- Online Bookstore Database - Schema
+-- =========================================
+
+DROP TABLE IF EXISTS order_items;
+DROP TABLE IF EXISTS orders;
+DROP TABLE IF EXISTS books;
+DROP TABLE IF EXISTS customers;
+
+-- Customers who place orders
+CREATE TABLE customers (
+    customer_id   INT AUTO_INCREMENT PRIMARY KEY,
+    first_name    VARCHAR(50) NOT NULL,
+    last_name     VARCHAR(50) NOT NULL,
+    email         VARCHAR(100) NOT NULL UNIQUE,
+    city          VARCHAR(50),
+    signup_date   DATE NOT NULL
+);
+
+-- Book catalog
+CREATE TABLE books (
+    book_id       INT AUTO_INCREMENT PRIMARY KEY,
+    title         VARCHAR(150) NOT NULL,
+    author        VARCHAR(100) NOT NULL,
+    genre         VARCHAR(50),
+    price         DECIMAL(6,2) NOT NULL,
+    stock_qty     INT NOT NULL DEFAULT 0
+);
+
+-- One row per order
+CREATE TABLE orders (
+    order_id      INT AUTO_INCREMENT PRIMARY KEY,
+    customer_id   INT NOT NULL,
+    order_date    DATE NOT NULL,
+    status        VARCHAR(20) NOT NULL DEFAULT 'pending',
+    FOREIGN KEY (customer_id) REFERENCES customers(customer_id)
+);
+
+-- Line items within an order (an order can contain multiple books)
+CREATE TABLE order_items (
+    order_item_id INT AUTO_INCREMENT PRIMARY KEY,
+    order_id      INT NOT NULL,
+    book_id       INT NOT NULL,
+    quantity      INT NOT NULL DEFAULT 1,
+    unit_price    DECIMAL(6,2) NOT NULL,
+    FOREIGN KEY (order_id) REFERENCES orders(order_id),
+    FOREIGN KEY (book_id) REFERENCES books(book_id)
+);
