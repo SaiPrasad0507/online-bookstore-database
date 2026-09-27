@@ -1,0 +1,38 @@
+-- =========================================
+-- Online Bookstore Database - Sample Data
+-- =========================================
+
+INSERT INTO customers (first_name, last_name, email, city, signup_date) VALUES
+('Aarav', 'Sharma', 'aarav.sharma@example.com', 'Jaipur', '2024-01-15'),
+('Meera', 'Nair', 'meera.nair@example.com', 'Bengaluru', '2024-02-03'),
+('Rohan', 'Verma', 'rohan.verma@example.com', 'Delhi', '2024-02-20'),
+('Ananya', 'Iyer', 'ananya.iyer@example.com', 'Mumbai', '2024-03-05'),
+('Kabir', 'Singh', 'kabir.singh@example.com', 'Jaipur', '2024-03-18');
+
+INSERT INTO books (title, author, genre, price, stock_qty) VALUES
+('The Silent Patient', 'Alex Michaelides', 'Thriller', 399.00, 25),
+('Atomic Habits', 'James Clear', 'Self-Help', 499.00, 40),
+('The Alchemist', 'Paulo Coelho', 'Fiction', 299.00, 60),
+('Sapiens', 'Yuval Noah Harari', 'Non-Fiction', 549.00, 15),
+('Clean Code', 'Robert C. Martin', 'Technology', 699.00, 10),
+('The Hobbit', 'J.R.R. Tolkien', 'Fantasy', 349.00, 30),
+('Educated', 'Tara Westover', 'Memoir', 399.00, 12);
+
+INSERT INTO orders (customer_id, order_date, status) VALUES
+(1, '2024-04-01', 'delivered'),
+(2, '2024-04-02', 'delivered'),
+(1, '2024-04-10', 'shipped'),
+(3, '2024-04-12', 'pending'),
+(4, '2024-04-15', 'delivered'),
+(5, '2024-04-18', 'cancelled');
+
+INSERT INTO order_items (order_id, book_id, quantity, unit_price) VALUES
+(1, 1, 1, 399.00),
+(1, 3, 2, 299.00),
+(2, 2, 1, 499.00),
+(3, 4, 1, 549.00),
+(3, 5, 1, 699.00),
+(4, 6, 3, 349.00),
+(5, 2, 1, 499.00),
+(5, 7, 1, 399.00),
+(6, 1, 1, 399.00);
