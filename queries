@@ -1,0 +1,117 @@
+-- =========================================
+-- Online Bookstore Database - Practice Queries
+-- =========================================
+
+-- 1. Basic SELECT: list all books
+SELECT * FROM books;
+
+-- 2. Filter with WHERE: books priced under 400
+SELECT title, author, price
+FROM books
+WHERE price < 400;
+
+-- 3. Sorting: cheapest books first
+SELECT title, price
+FROM books
+ORDER BY price ASC;
+
+-- 4. LIKE: books by an author whose name contains "Tolkien"
+SELECT title, author
+FROM books
+WHERE author LIKE '%Tolkien%';
+
+-- 5. IN: customers from specific cities
+SELECT first_name, last_name, city
+FROM customers
+WHERE city IN ('Jaipur', 'Mumbai');
+
+-- 6. Aggregate functions: total books in stock, average price
+SELECT
+    COUNT(*)        AS total_titles,
+    SUM(stock_qty)  AS total_stock,
+    ROUND(AVG(price), 2) AS avg_price,
+    MAX(price)      AS most_expensive,
+    MIN(price)      AS cheapest
+FROM books;
+
+-- 7. GROUP BY: number of books per genre
+SELECT genre, COUNT(*) AS num_books
+FROM books
+GROUP BY genre
+ORDER BY num_books DESC;
+
+-- 8. GROUP BY + HAVING: genres with more than 1 book
+SELECT genre, COUNT(*) AS num_books
+FROM books
+GROUP BY genre
+HAVING COUNT(*) > 1;
+
+-- 9. JOIN: each order with the customer's name
+SELECT o.order_id, c.first_name, c.last_name, o.order_date, o.status
+FROM orders o
+JOIN customers c ON o.customer_id = c.customer_id;
+
+-- 10. Multi-table JOIN: full order details (customer + book + quantity)
+SELECT
+    o.order_id,
+    c.first_name || ' ' || c.last_name AS customer_name,
+    b.title,
+    oi.quantity,
+    oi.unit_price,
+    (oi.quantity * oi.unit_price) AS line_total
+FROM orders o
+JOIN customers c   ON o.customer_id = c.customer_id
+JOIN order_items oi ON o.order_id = oi.order_id
+JOIN books b        ON oi.book_id = b.book_id
+ORDER BY o.order_id;
+
+-- 11. Total spent per customer
+SELECT
+    c.first_name,
+    c.last_name,
+    SUM(oi.quantity * oi.unit_price) AS total_spent
+FROM customers c
+JOIN orders o        ON c.customer_id = o.customer_id
+JOIN order_items oi  ON o.order_id = oi.order_id
+GROUP BY c.customer_id, c.first_name, c.last_name
+ORDER BY total_spent DESC;
+
+-- 12. Subquery: books that have never been ordered
+SELECT title
+FROM books
+WHERE book_id NOT IN (
+    SELECT DISTINCT book_id FROM order_items
+);
+
+-- 13. Subquery: customers who spent more than the average customer
+SELECT first_name, last_name, total_spent
+FROM (
+    SELECT
+        c.customer_id,
+        c.first_name,
+        c.last_name,
+        SUM(oi.quantity * oi.unit_price) AS total_spent
+    FROM customers c
+    JOIN orders o       ON c.customer_id = o.customer_id
+    JOIN order_items oi ON o.order_id = oi.order_id
+    GROUP BY c.customer_id, c.first_name, c.last_name
+) AS customer_totals
+WHERE total_spent > (
+    SELECT AVG(quantity * unit_price) FROM order_items
+);
+
+-- 14. A simple VIEW: reusable "order summary" view
+CREATE VIEW order_summary AS
+SELECT
+    o.order_id,
+    c.first_name || ' ' || c.last_name AS customer_name,
+    o.order_date,
+    o.status,
+    SUM(oi.quantity * oi.unit_price) AS order_total
+FROM orders o
+JOIN customers c    ON o.customer_id = c.customer_id
+JOIN order_items oi ON o.order_id = oi.order_id
+GROUP BY o.order_id, c.first_name, c.last_name, o.order_date, o.status;
+
+-- Use the view like a table:
+SELECT * FROM order_summary ORDER BY order_total DESC;
